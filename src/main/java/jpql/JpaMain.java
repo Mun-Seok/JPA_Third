@@ -120,9 +120,194 @@ public class JpaMain {
 //                System.out.println("member1 = " + member1);
 //            }
 
+//            Team team = new Team();
+//            team.setName("teamA");
+//            em.persist(team);
+//
+//            Member member = new Member();
+//            member.setUsername("member1");
+//            member.setAge(10);
+//
+//            em.persist(member);
+//
+//            em.flush();
+//            em.clear();
 
+            // 조인
+            // 1. 내부 조인
+//            String query = "select m from Member m inner join m.team t"; // inner 생략 가능
+//            List<Member> result = em.createQuery(query, Member.class)
+//                            .setFirstResult(1)
+//                            .setMaxResults(10)
+//                            .getResultList();
+
+            // 2. 외부 조인
+//            String query = "select m from Member m left outer join m.team t"; // outer 생략 가능
+//            List<Member> result = em.createQuery(query, Member.class)
+//                    .setFirstResult(1)
+//                    .setMaxResults(10)
+//                    .getResultList();
+
+//            // 3. 세타 조인
+//            String query = "select m from Member m, Team t where m.username = t.name";
+//            List<Member> result = em.createQuery(query, Member.class)
+//                    .setFirstResult(1)
+//                    .setMaxResults(10)
+//                    .getResultList();
+
+            // 조인 - ON절
+            // 1. 조인 대상 필터링
+//            String query = "select m from Member m inner join m.team t on t.name = 'A'"; // 회원과 팀 조인하면서 팀 이름이 A인 팀만 조인
+//            List<Member> result = em.createQuery(query, Member.class)
+//                    .getResultList();
+
+            // 2. 연관관계 없는 엔티티 외부 조인
+//            String query = "select m from Member m left join Team t on m.username = t.name";
+//            List<Member> result = em.createQuery(query, Member.class)
+//                    .getResultList();
+//
+//            System.out.println("result = " + result.size());
+
+
+            // 서브 쿼리
+            // 하이버네이트에서 지원해 SELECT 절도 서브 쿼리 가능
+//            String query = "select (select avg(m1.age) from Member m1)  join Team t on m.username = t.name";
+//            List<Member> result = em.createQuery(query, Member.class)
+//                    .getResultList();
+
+            // FROM절에 서브 쿼리는 불가능
+//            String query = "select mm from (select m.age from Member m) as mm"; // 불가능 -> 조인으로 풀 수 있으면 풀어서 해결
+//            List<Member> result = em.createQuery(query, Member.class)
+//                    .getResultList();
+
+//            Team team = new Team();
+//            team.setName("teamA");
+//            em.persist(team);
+//
+//            Member member = new Member();
+//            member.setUsername("관리자");
+//            member.setAge(10);
+//            member.setType(MemberType.ADMIN);
+//
+//            member.setTeam(team);
+//
+//            em.persist(member);
+//
+//            em.flush();
+//            em.clear();
+
+            // JPQL 타입 표현
+//            String query = "select m.username, 'HELLO', TRUE From Member m" +
+//                            "where m.type = :userType";
+//            List<Object[]> result = em.createQuery(query)
+//                    .setParameter("userType", MemberType.ADMIN)
+//                    .getResultList();
+//
+//            for (Object[] objects : result) {
+//                System.out.println("objects = " + objects[0]);
+//                System.out.println("objects = " + objects[1]);
+//                System.out.println("objects = " + objects[2]);
+//            }
+
+            // 조건식 - CASE식
+            // 기본 CASE식
+//            String query =
+//                    "select " +
+//                            "case when m.age <= 10 then '학생요금'" +
+//                            "     when m.age >= 60 then '경로요금'" +
+//                            "     else '일반요금' " +
+//                            "end " +
+//                    "from Member m";
+//            List<String> result = em.createQuery(query, String.class)
+//                    .getResultList();
+
+            // COALESCE
+//            String query =
+//                    "select coalesce(m.username, '이름 없는 회원') from Member m";
+//            List<String> result = em.createQuery(query, String.class)
+//                    .getResultList();
+//
+//            for (String s : result) {
+//                System.out.println("s = " + s);
+//            }
+
+            // NULLIF
+//            String query =
+//                    "select nullif(m.username, '관리자') from Member m";
+//            List<String> result = em.createQuery(query, String.class)
+//                    .getResultList();
+//
+//            for (String s : result) {
+//                System.out.println("s = " + s);
+//            }
+
+            // JPQL 함수
+//            String query = "select concat('a', 'b') From Member m";  // concat
+//            String query = "select substring(m.username, 2, 3) From Member m";  // substring
+//            List<String> result = em.createQuery(query, String.class)
+//                    .getResultList();
+//
+//            for (String s : result) {
+//                System.out.println("s = " + s);
+//            }
+
+            // fetch 조인
+            Team teamA = new Team();
+            teamA.setName("팀A");
+            em.persist(teamA);
+
+            Team teamB = new Team();
+            teamB.setName("팀B");
+            em.persist(teamB);
+
+            Member member1 = new Member();
+            member1.setUsername("회원1");
+            member1.setTeam(teamA);
+            em.persist(member1);
+
+            Member member2 = new Member();
+            member2.setUsername("회원2");
+            member2.setTeam(teamA);
+            em.persist(member2);
+
+            Member member3 = new Member();
+            member3.setUsername("회원3");
+            member3.setTeam(teamB);
+            em.persist(member3);
+
+            em.flush();
+            em.clear();
+
+//            String query = "select m From Member m"; // fetch join X
+//            String query = "select m From Member m join fetch m.team"; // 엔티티 fetch join
+
+            String query = "select distinct t From Team t join fetch t.members"; // 컬렉션 fetch join
+
+//            List<Member> result = em.createQuery(query, Member.class)
+//                    .getResultList();
+
+            List<Team> result = em.createQuery(query, Team.class)
+                    .getResultList();
+
+//            for (Member member : result) {
+//                System.out.println("member = " + member.getUsername() + ", " + member.getTeam().getName()); // 지연로딩으로 proxy였지만 fetch join으로 지연 로딩 X
+//                // 회원1, 팀A(SQL)
+//                // 회원2, 팀A(1차캐시)
+//                // 회원3, 팀B(SQL)
+//
+//                // -> 쿼리가 3번 if 회원 100명? -> N + 1
+//                // fetch join 사용해 쿼리 한번
+//            }
+
+            for (Team team : result) {
+                System.out.println("team = " + team.getName() + "| members = " + team.getMembers().size());
+                for (Member member : team.getMembers()) {
+                    System.out.println("-> member = " + member);
+                }
+            }
 
             tx.commit();
+
         }catch(Exception e){
             tx.rollback();
         } finally {
