@@ -281,13 +281,34 @@ public class JpaMain {
 //            String query = "select m From Member m"; // fetch join X
 //            String query = "select m From Member m join fetch m.team"; // 엔티티 fetch join
 
-            String query = "select distinct t From Team t join fetch t.members"; // 컬렉션 fetch join
+//            String query = "select distinct t From Team t join fetch t.members"; // 컬렉션 fetch join
+
+//            String query = "select t From Team t";
+
+
+//            String query = "select m from Member m where m = :member"; // 엔티티 직접 사용 - 기본 키 값
+
+//            String query = "select m from Member m where m.team = :team"; // 엔티티 직접 사용 - 외래 키 값
+
 
 //            List<Member> result = em.createQuery(query, Member.class)
 //                    .getResultList();
 
-            List<Team> result = em.createQuery(query, Team.class)
-                    .getResultList();
+//            List<Team> result = em.createQuery(query, Team.class)
+//                    .getResultList();
+//
+//            List<Team> result = em.createQuery(query, Team.class) // 컬렉션 페치 조인 불가능 -> Team에 BatchSize 설정
+//                    .setFirstResult(0)
+//                    .setMaxResults(2)
+//                    .getResultList();
+
+//            Member findMember = em.createQuery(query, Member.class)
+//                    .setParameter("member", member1)
+//                    .getSingleResult();
+
+//            List<Member> members = em.createQuery(query, Member.class)
+//                    .setParameter("team", teamA)
+//                    .getResultList();
 
 //            for (Member member : result) {
 //                System.out.println("member = " + member.getUsername() + ", " + member.getTeam().getName()); // 지연로딩으로 proxy였지만 fetch join으로 지연 로딩 X
@@ -299,12 +320,35 @@ public class JpaMain {
 //                // fetch join 사용해 쿼리 한번
 //            }
 
-            for (Team team : result) {
-                System.out.println("team = " + team.getName() + "| members = " + team.getMembers().size());
-                for (Member member : team.getMembers()) {
-                    System.out.println("-> member = " + member);
-                }
-            }
+//            for (Team team : result) {
+//                System.out.println("team = " + team.getName() + "| members = " + team.getMembers().size());
+//                for (Member member : team.getMembers()) {
+//                    System.out.println("-> member = " + member);
+//                }
+//            }
+
+//            System.out.println("findMember = " + findMember);
+
+//            for (Member member : members) {
+//                System.out.println("member = " + member);
+//            }
+
+//            List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
+//                    .setParameter("username", " 회원1")
+//                    .getResultList();
+
+//            for (Member member : resultList) {
+//                System.out.println("member = " + member);
+//            }
+
+
+            // FLUSH
+            int resultCount = em.createQuery("update Member m set m.age = 20")
+                    .executeUpdate(); // 벌크 연산
+
+            Member findMember = em.find(Member.class, member2.getId());
+
+            System.out.println("findMember = " + findMember.getAge());
 
             tx.commit();
 
